@@ -2,12 +2,13 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
-const tl = require('trivialog');
 const expJwt = require('express-jwt');
+const morgan = require('morgan');
+const tl = require('trivialog');
 const fs = require('fs');
 
 // Disable screen output
-tl.setParam('outScreen', false);
+tl.setParam('outScreen', true);
 
 // Load secret key
 const secKey = fs.readFileSync(__dirname + '/lib/key.secret');
@@ -16,6 +17,10 @@ const secKey = fs.readFileSync(__dirname + '/lib/key.secret');
 const app = express();
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+
+// Add access logs
+const accessLogStream = fs.createWriteStream(__dirname + '/logs/access.log', {flags: 'a'});
+app.use(morgan('combined', {stream: accessLogStream}));
 
 // Load routes files
 const api  = require('./routes/api');
@@ -29,8 +34,8 @@ app.use(helmet());
 
 // Accept only SSL connections unless I'm from localhost (without a proxy)
 app.use((req, res, next) => {
-    // TODO - This could produce an error in others platforms
-    if (req.ip.split(':')[3] === '127.0.0.1') {
+    // Bypass SSL check if connect from localhost
+    if (req.headers['x-real-ip'] === '127.0.0.1') {
         tl.log('WARN','Connection from localhost');
         return next();
     }
@@ -43,7 +48,7 @@ app.use((req, res, next) => {
 });
 
 // Add routes (Secured with express-jwt. To unsecure some route, use "unless")
-app.use('/api',  expJwt({secret: secKey}), api);
+app.use('/api',  expJwt({secret: secKey}).unless({path: ['/api/status']}), api);
 app.use('/auth', expJwt({secret: secKey}).unless({path: ['/auth/login']}), auth);
 
 // Listen

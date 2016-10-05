@@ -1,12 +1,16 @@
 'use strict';
 const express = require('express');
-const tl = require('trivialog');
 const router = express.Router();
 
 // Return status code of the app (check for db connections, fs status, etc.)
 router.get('/status', (req, res) => {
-    tl.log('GET /status');
-    res.jsonp({ status: 'ok'});
+    // Return a fake { status: 'ok' } with a random delay to simulate an elaboration
+    setTimeout(() => res.jsonp({ status: 'ok'}), Math.random() * (3000 - 100) + 100);
+});
+
+// Protected route
+router.get('/protected', (req, res) => {
+    res.jsonp({ secure: true});
 })
 
 module.exports = router;

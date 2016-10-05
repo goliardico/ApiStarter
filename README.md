@@ -12,6 +12,7 @@ if (req.headers['x-forwarded-proto'] !== 'https') {
     return res.sendStatus(400);
 }
 ```
+but I've put a filter to bypass SSL check if connection comes from localhost (Proxy insert X-Real-IP to 127.0.0.1).
 
 The JWT use the default algorithm HS256 and read the secret key from a file (not included) in lib/key.secret.
 

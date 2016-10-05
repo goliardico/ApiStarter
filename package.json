@@ -17,6 +17,7 @@
     "express": "^4.14.0",
     "express-jwt": "^5.0.0",
     "helmet": "^2.2.0",
+    "morgan": "^1.7.0",
     "trivialog": "^1.2.0"
   },
   "devDependencies": {
