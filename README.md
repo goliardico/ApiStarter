@@ -24,7 +24,7 @@ Clone the repository:
 
 ```sh
 
-git clone https://github.com/goliardico/ApiStarter.git
+git clone https://github.com/pgdata/ApiStarter.git
 
 ```
 Put something in key.secret file:
